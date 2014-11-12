@@ -1,0 +1,101 @@
+<?php
+
+ class parcelshopfinder
+	{
+		public function __construct()
+		{
+			//$this->pc_name = Configuration::get('DPDSHIPPING_PC_NAME');
+			//$this->pc_token = Configuration::get('DPDSHIPPING_PC_TOKEN');
+			//$this->uc_cuid = Configuration::get('DPDSHIPPING_UC_CUID');
+			//$this->uc_token = Configuration::get('DPDSHIPPING_UC_TOKEN');
+			
+			$this->pc_name = "DPD Sandbox";
+			$this->pc_token = "06445364853584D75564";
+			$this->uc_cuid = "1110";
+			$this->uc_token = "45955496D6A6633";
+			
+			$this->soap_url = 'https://cloud-stage.dpd.com/services/v1/DPDCloudService.asmx?wsdl';
+			$this->soap_version = '100';
+			$this->soap_language = 'en_EN'; //TODO: Use site language for this?
+		}
+		
+		private function dpdSoapCall($strUrl, $strFunction, $arrBodyParam)
+		{
+			$client = new SoapClient($strUrl);
+			
+			$sHeader = new SoapHeader('https://coud.dpd.com/', 'parcelshopFinder');
+			$client->__setSoapHeaders(array($sHeader));
+			
+			$result;
+			try {
+				$result = $client->__soapCall($strFunction, array($arrBodyParam));
+			} catch (SoapFault $fault) {
+				throw new Exception('An error occured during Soap call to server. '.$fault->getMessage().': '.$client->__getLastRequest(), 800);
+			}
+			unset($client);
+		
+			return $result;;
+			
+		}
+		
+		public function findParcelShop($long, $lat, $filter = false, $limit = 15)
+		{
+			$function = 'getParcelShopFinder';
+			$body = array(
+				'getParcelShopFinderRequest' => array(
+																									'Version'	=> $this->soap_version,
+																					'Language'	=> $this->soap_language,
+					'PartnerCredentials'	=> array(
+						'Name' => $this->pc_name,
+						'Token' => $this->pc_token,
+					),
+								'UserCredentials'	=> array(
+						'cloudUserID' => $this->uc_cuid,
+																		'Token' => $this->uc_token
+					),
+					'MaxReturnValues'	=> $limit,
+														'SearchMode'	=> 'SearchByGeoData',
+								'SearchGeoData'	=> array(
+						'Longitude'	=> (float)$long,
+										'Latitude'	=> (float)$lat,
+					),
+					
+				)
+			);
+			
+			if($filter){
+				switch($filter){
+					case 'pick-up':
+						$body['getParcelShopFinderRequest']['NeedService'] = 'ConsigneePickup';
+						break;
+					case 'return':
+						$body['getParcelShopFinderRequest']['NeedService'] = 'ReturnService';
+						break;
+					default:
+				}
+					$body['getParcelShopFinderRequest']['NeedService'] = 'ConsigneePickup';
+			}
+				
+			$result;
+			try {
+				$result = $this->dpdSoapCall($this->soap_url, $function, $body);
+			} catch (Exception $e) {
+				throw new Exception('Something went wrong looking for the parcelshops:'.'/r/n'.$e->getMessage());
+			}
+			return $result;
+		}
+		
+	}
+	
+				
+	if(isset($_GET['findParcelShops'])){
+		$result;
+		try{
+			$finder = new parcelshopfinder();
+			$result = $finder->findParcelShop($_GET['long'], $_GET['lat'], $_GET['findParcelShops']);
+		} catch (Exception $e){
+			echo $e; //"FALSE";
+			die();
+		}
+		echo json_encode($result);
+	}
