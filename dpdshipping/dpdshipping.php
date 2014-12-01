@@ -92,7 +92,7 @@ class DpdShipping extends CarrierModule
 			|| !$this->unregisterHook('extraCarrier')
 			|| !$this->unregisterHook('actionCarrierProcess')
 			|| !$this->unregisterHook('updateCarrier') 
-			)
+		)
 			return false;
 			
 		// Remove config fields

@@ -34,7 +34,9 @@ class DPDParcelShop
 			`shop_country` varchar(2) DEFAULT NULL,
 			`shop_zipcode` varchar(10) DEFAULT NULL,
 			`shop_city` varchar(50) DEFAULT NULL,
-			`date_add` datetime DEFAULT CURRENT_TIMESTAMP
+			`date_add` datetime DEFAULT CURRENT_TIMESTAMP,
+			`date_update`datetime DEFAULT CURRENT_TIMESTAMP
+			PRIMARY KEY (`id_cart`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8;")
 		)
 			return false;
@@ -46,25 +48,29 @@ class DPDParcelShop
 	{
 		if($shop_details)
 		{
-			Db::getInstance()->insert($this->table, 
-				array(
-					'id_cart' => (int)$id_cart,
-					'id_parcelshop' => (int)$shop_id,
-					'shop_name' => (string)$shop_details->name,
-					'shop_street' => (string)$shop_details->street,
-					'shop_houseno' => (string)$shop_details->houseNo,
-					'shop_country' => (string)$shop_details->country,
-					'shop_zipcode' => (string)$shop_details->zipCode,
-					'shop_city' => (string)$shop_details->city
-				)
-			);
+			return(Db::getInstance()->execute("INSERT INTO "._DB_PREFIX_.$this->table." (`id_cart`,`id_parcelshop`,`shop_name`,`shop_street`,`shop_houseno`,`shop_country`,`shop_zipcode`,`shop_city`) 
+				VALUES (".(int)$id_cart.",".(int)$shop_id.",'".(string)$shop_details->name."','".(string)$shop_details->street."','".(string)$shop_details->houseNo."','".(string)$shop_details->country."','".(string)$shop_details->zipCode."','".(string)$shop_details->city."')
+				ON DUPLICATE KEY UPDATE
+					`id_parcelshop` =  ".(int)$shop_id.",
+					`shop_name` = '".(string)$shop_details->name."',
+					`shop_street` = '".(string)$shop_details->street."',
+					`shop_houseno` = '".(string)$shop_details->houseNo."',
+					`shop_country` = '".(string)$shop_details->country."',
+					`shop_zipcode` = '".(string)$shop_details->zipCode."',
+					`shop_city` = '".(string)$shop_details->city."',
+					`date_update`= NOW();"));
 		} else {
-			Db::getInstance()->insert($this->table, 
-				array(
-					'id_cart' => (int)$id_cart,
-					'id_parcelshop' => (int)$shop_id
-				)
-			);
+			return(Db::getInstance()->execute("INSERT INTO "._DB_PREFIX_.$this->table." (`id_cart`,`id_parcelshop`) 
+				VALUES (".(int)$id_cart.",".(int)$shop_id.")
+				ON DUPLICATE KEY UPDATE
+					`id_parcelshop` =  ".(int)$shop_id.",
+					`shop_name` = '',
+					`shop_street` = '',
+					`shop_houseno` = '',
+					`shop_country` = '',
+					`shop_zipcode` = '',
+					`shop_city` = '',
+					`date_update`= NOW();"));
 		}
 	}
 	

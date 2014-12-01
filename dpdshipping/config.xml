@@ -2,7 +2,7 @@
 <module>
 	<name>dpdshipping</name>
 	<displayName><![CDATA[DPD Shipping]]></displayName>
-	<version><![CDATA[0.1]]></version>
+	<version><![CDATA[0.2]]></version>
 	<description><![CDATA[This module depends on the DPD Delicom webservices for ParcelShop location, label generation and tracking.]]></description>
 	<author><![CDATA[Michiel Van Gucht]]></author>
 	<tab><![CDATA[shipping_logistics]]></tab>
