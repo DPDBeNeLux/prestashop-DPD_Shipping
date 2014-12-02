@@ -34,8 +34,8 @@ class DPDParcelShop
 			`shop_country` varchar(2) DEFAULT NULL,
 			`shop_zipcode` varchar(10) DEFAULT NULL,
 			`shop_city` varchar(50) DEFAULT NULL,
-			`date_add` datetime DEFAULT CURRENT_TIMESTAMP,
-			`date_update`datetime DEFAULT CURRENT_TIMESTAMP
+			`date_add` timestamp DEFAULT CURRENT_TIMESTAMP,
+			`date_update` datetime DEFAULT NULL,
 			PRIMARY KEY (`id_cart`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8;")
 		)
