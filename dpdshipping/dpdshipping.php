@@ -20,7 +20,7 @@ class DpdShipping extends CarrierModule
 		$this->config = new DpdConfig();	// Special configuration class to automate (un)install and form generation.
 		$this->name = 'dpdshipping';
 		$this->tab = 'shipping_logistics';
-		$this->version = '0.1';
+		$this->version = '0.3';
 		$this->author = 'Michiel Van Gucht';
 		$this->need_instance = 1;
 		//$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
@@ -161,31 +161,15 @@ class DpdShipping extends CarrierModule
 			);
 			foreach ($config_group['elements'] as $element)
 			{
-				$fields_form[$group_key]['form']['input'][] = array(
-					'type' => 'text',
-					'label'	=> $this->l($element['user_readable_name']),
-					'name'	=> $element['name'],
-					'required'	=> $element['required']
-				);
+				$config = $element;
+				$config['label'] = $this->l($element['user_readable_name']);
+				
+				if(!isset($element['type']))
+					$config['type'] = 'text';
+					
+				$fields_form[$group_key]['form']['input'][] = $config;
 			}
 		}
-		
-		$fields_form[0]['form']['input'][] = array(
-			'type' => 'checkbox',
-			'label'	=> $this->l('Live Server'),
-			'name'	=> 'DPDSHIPPING_LIVE_SERVER',
-			'required'	=> false,
-			'values' => array(
-				'query' => array(
-					array(
-						'id' => 'test',
-						'name' => $this->l('show'),
-						'val' => '1',
-						'checked' => 'checked'
-					)
-				)
-			)
-		);
 		
 		$helper = new HelperForm();
 		
@@ -208,11 +192,11 @@ class DpdShipping extends CarrierModule
 			'save' =>
 				array(
 					'desc' => $this->l('Save'),
-							'href' => AdminController::$currentIndex.'&configure='.$this->name.'&save'.$this->name.'&token='.Tools::getAdminTokenLite('AdminModules'),
+					'href' => AdminController::$currentIndex.'&configure='.$this->name.'&save'.$this->name.'&token='.Tools::getAdminTokenLite('AdminModules'),
 				),
-				'back'	=> 
-					array(
-							'href'	=> AdminController::$currentIndex.'&token='.Tools::getAdminTokenLite('AdminModules'),
+			'back'	=> 
+				array(
+					'href'	=> AdminController::$currentIndex.'&token='.Tools::getAdminTokenLite('AdminModules'),
 					'desc'	=> $this->l('Back to list')
 				)
 			);
@@ -367,8 +351,28 @@ class DpdConfig
 				),
 				array(
 					'name'	=> 'DPDSHIPPING_PC_TOKEN',
-					'user_readable_name'	=>	'Token',
+					'user_readable_name'	=> 	'Token',
 					'required'	=> true
+				),
+				array(
+					'type' => 'radio',
+					'name' 	=> 'DPDSHIPPING_LIVE_SERVER',
+					'user_readable_name' => 'Live Server',
+					'required' => true,
+					'class' => 't',
+					'is_bool' => true,
+					'values' => array(
+						array(
+							'id' => 'active_on',
+							'value' => 1,
+							'label' => 'Yes'
+						),
+						array(
+							'id_' => 'active_off',
+							'value' => 2,
+							'label' => 'No',
+						)
+					)
 				)
 			)
 		),

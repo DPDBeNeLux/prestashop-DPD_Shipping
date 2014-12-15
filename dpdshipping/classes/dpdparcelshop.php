@@ -23,9 +23,9 @@ class DPDParcelShop
 		$this->table = 'cart_dpdparcelshop';
 	}
 	
-	public function install()
+	public static function install()
 	{
-		if(!Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."cart_dpdparcelshop` (
+		Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS `"._DB_PREFIX_."cart_dpdparcelshop` (
 			`id_cart` int(10) unsigned DEFAULT NULL,
 			`id_parcelshop` int(6) unsigned DEFAULT NULL,
 			`shop_name` varchar(100) DEFAULT NULL,
@@ -34,12 +34,10 @@ class DPDParcelShop
 			`shop_country` varchar(2) DEFAULT NULL,
 			`shop_zipcode` varchar(10) DEFAULT NULL,
 			`shop_city` varchar(50) DEFAULT NULL,
-			`date_add` timestamp DEFAULT CURRENT_TIMESTAMP,
-			`date_update` datetime DEFAULT NULL,
+			`date_add` datetime DEFAULT CURRENT_TIMESTAMP,
+			`date_update`datetime DEFAULT CURRENT_TIMESTAMP
 			PRIMARY KEY (`id_cart`)
-			) ENGINE=MyISAM DEFAULT CHARSET=utf8;")
-		)
-			return false;
+			) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
 			
 		return true;
 	}

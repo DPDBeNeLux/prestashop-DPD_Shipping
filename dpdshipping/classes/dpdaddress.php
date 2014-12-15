@@ -8,11 +8,15 @@ function isDPDAddress($mixed){
 
 class DPDAddress
 {
+	public $company;
+	public $salutation;
+	public $name;
 	public $street;
 	public $houseNo;
 	public $zipCode;
 	public $city;
 	public $country;
+	public $mail;
 	
 	public function __construct($street, $houseNo, $zipCode, $city, $country)
 	{

@@ -13,7 +13,9 @@ class DpdShippingParcelShopLocatorModuleFrontController extends ModuleFrontContr
 		$this->uc_cuid = Configuration::get('DPDSHIPPING_UC_CUID');
 		$this->uc_token = Configuration::get('DPDSHIPPING_UC_TOKEN');
 		
-		$connection = new DPDCloud($this->pc_name, $this->pc_token, $this->uc_cuid, $this->uc_token); 
+		$this->live = Configuration::get('DPDSHIPPING_LIVE_SERVER') == 1 ? true : false;
+		
+		$connection = new DPDCloud($this->pc_name, $this->pc_token, $this->uc_cuid, $this->uc_token, $this->live); 
 		$dpdGeoData = new DPDGeoData($_POST['long'], $_POST['lat']);
 		
 		echo json_encode($connection->findParcelShop($dpdGeoData));

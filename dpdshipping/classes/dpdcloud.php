@@ -4,7 +4,7 @@ if (!defined('_PS_VERSION_'))
 	
 class DPDCloud
 {
-	public $pc_name;
+	public 	$pc_name;
 	public	$pc_token;
 	public	$uc_cuid;
 	public	$uc_token;
@@ -15,12 +15,17 @@ class DPDCloud
 	public $cloud_version = '100';
 	public $cloud_language = 'en_EN';
 	
-	public function __construct($pc_name, $pc_token, $uc_cuid, $uc_token)
+	public function __construct($pc_name, $pc_token, $uc_cuid, $uc_token, $live = false)
 	{
 		$this->pc_name = $pc_name;
 		$this->pc_token = $pc_token;
 		$this->uc_cuid = $uc_cuid;
 		$this->uc_token = $uc_token;
+		
+		if($live)
+		{
+			$this->cloud_url = 'https://cloud.dpd.com/services/v1/DPDCloudService.asmx?wsdl';
+		}
 	}
 	
 	public function testConnection(){
@@ -51,6 +56,55 @@ class DPDCloud
 			throw new Exception(get_class($this).': findParcelShop expects an Address or GeoData.');
 	}
 	
+	public function setOrder($settings, $cnee_address, $parcel_details, $amount = 1){
+		$function = 'setOrder';
+		$body = array(
+			'setOrderRequest' => array(
+				'Version'	=> $this->cloud_version,
+				'Language'	=> $this->cloud_language,
+				'PartnerCredentials'	=> array(
+					'Name' => $this->pc_name,
+					'Token' => $this->pc_token
+				),
+				'UserCredentials'	=> array(
+					'cloudUserID' => $this->uc_cuid,
+					'Token' => $this->uc_token
+				),
+				'OrderAction'	=> 'startOrder',
+				'OrderSettings'	=> array(
+					'ShipDate'	=> date("Y-m-d\TH:i:s"),
+					'LabelSize'	=> $settings['labelSize'],
+					'LabelStartPosition'	=> $settings['labelStartPosition']
+				),
+				'OrderDataList'	=> array(
+					'OrderData' => array(
+						array(
+							'ShipAddress' => array(
+								'Company' => $cnee_address->company,
+								'Salutation' => $cnee_address->salutation,
+								'Name' => $cnee_address->name,
+								'Street' => $cnee_address->street,
+								'HouseNo' => $cnee_address->houseNo,
+								'Country' => $cnee_address->country,
+								'ZipCode' => $cnee_address->zipcode,
+								'City' =>  $cnee_address->city,
+								'Mail' => $cnee_address->mail
+							)
+						),
+						'ParcelData' => array(
+							'ShipService' => $parcel_details['service'],
+							'Weight' => $parcel_details['weight'],
+							'Content' => $parcel_details['content'],
+							'YourInternalID' => $parcel_details['yourInternalID'],
+							'Reference1' => $parcel_details['reference1']
+						)
+					)
+				)
+			)
+		);
+		return $this->cloudCall($function, $body);
+	}
+	
 	private function findParcelShopByAddress($data, $limit)
 	{
 		$function = 'getParcelShopFinder';
@@ -78,7 +132,9 @@ class DPDCloud
 				'NeedService' => 'ConsigneePickup'
 			)
 		);
-		return $this->cloudCall($function, $body);
+		$cloud_result = $this->cloudCall($function, $body);
+		
+		return $this->processParcelShopFinderResult($cloud_result);
 	}
 	
 	private function findParcelShopByGeoData($data, $limit)
