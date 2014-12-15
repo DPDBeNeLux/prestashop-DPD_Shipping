@@ -10,7 +10,8 @@
 
 	var dpdLocator = new DPD.locator({
 		rootpath: '{/literal}{$module_path}{literal}',
-		ajaxpath: '/module/dpdshipping/parcelshoplocator',
+		//ajaxpath: '{/literal}{$base_dir}{literal}module/dpdshipping/parcelshoplocator',
+		ajaxpath: '{/literal}{$base_dir}{literal}index.php?fc=module&module=dpdshipping&controller=parcelshoplocator',
 		containerId: 'dpdLocatorContainer',
 		fullscreen: false,
 		width: '100%',
