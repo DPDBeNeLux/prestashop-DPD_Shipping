@@ -10,7 +10,6 @@
 
 	var dpdLocator = new DPD.locator({
 		rootpath: '{/literal}{$module_path}{literal}',
-		//ajaxpath: '{/literal}{$base_dir}{literal}module/dpdshipping/parcelshoplocator',
 		ajaxpath: '{/literal}{$base_dir}{literal}index.php?fc=module&module=dpdshipping&controller=parcelshoplocator',
 		containerId: 'dpdLocatorContainer',
 		fullscreen: false,
@@ -20,7 +19,7 @@
 		country: '{/literal}{$country}{literal}',
 		callback: 'dpdChosenShop',
 		dictionaryXML: '{/literal}{$dictionary_XML}{literal}',
-		language: 'en'
+		language: '{/literal}{$lang_iso}{literal}_{/literal}{$country}{literal}'
 	});
 	
 	dpdLocator.initialize();
