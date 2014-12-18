@@ -4,6 +4,7 @@ if (!defined('_PS_VERSION_'))
  exit;
 	
 include_once dirname(__FILE__).'/classes/dpdcloud.php';
+include_once dirname(__FILE__).'/classes/dpdcore.php';
 include_once dirname(__FILE__).'/classes/dpdaddress.php';
 include_once dirname(__FILE__).'/classes/dpdgeodata.php';
 include_once dirname(__FILE__).'/classes/dpdparcelshop.php';
@@ -342,16 +343,17 @@ class DpdConfig
 {
 	private $config = array(
 		array(
-			'name'	=> 'Partner Credentials',
+			'name'	=> 'Delis Credentials',
 			'elements'	=> array(
 				array(
-					'name'	=> 'DPDSHIPPING_PC_NAME',
-					'user_readable_name'	=>	'Name',
+					'name'	=> 'DPDSHIPPING_DELIS_ID',
+					'user_readable_name'	=>	'DelisID',
 					'required'	=> true
 				),
 				array(
-					'name'	=> 'DPDSHIPPING_PC_TOKEN',
-					'user_readable_name'	=> 	'Token',
+					'type' => 'password',
+					'name'	=> 'DPDSHIPPING_DELIS_PASSWORD',
+					'user_readable_name'	=> 	'Password',
 					'required'	=> true
 				),
 				array(
@@ -373,21 +375,6 @@ class DpdConfig
 							'label' => 'No',
 						)
 					)
-				)
-			)
-		),
-		array(
-			'name'	=> 'User Credentials',
-			'elements'	=> array(
-				array(
-					'name'	=> 'DPDSHIPPING_UC_CUID',
-					'user_readable_name'	=>	'Cloud User ID',
-					'required'	=> true
-				),
-				array(
-					'name'	=> 'DPDSHIPPING_UC_TOKEN',
-					'user_readable_name'	=>	'Token',
-					'required'	=> true
 				)
 			)
 		),
