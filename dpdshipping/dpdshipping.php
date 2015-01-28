@@ -65,6 +65,7 @@ class DpdShipping extends CarrierModule
 			|| !$this->registerHook('extraCarrier')
 			|| !$this->registerHook('actionCarrierProcess') 
 			|| !$this->registerHook('updateCarrier') 
+			|| !$this->registerHook('displayAdminOrderLeft') 
 		)
 			return false;
 		
@@ -93,6 +94,7 @@ class DpdShipping extends CarrierModule
 			|| !$this->unregisterHook('extraCarrier')
 			|| !$this->unregisterHook('actionCarrierProcess')
 			|| !$this->unregisterHook('updateCarrier') 
+			|| !$this->unregisterHook('displayAdminOrderLeft') 
 		)
 			return false;
 			
@@ -241,7 +243,6 @@ class DpdShipping extends CarrierModule
 	
 	public function hookHeader($params)
 	{
-		//$this->context->smarty->assign(array());
 		$this->context->controller->addCSS($this->_path.'views/templates/front/css/parcelshoplocator.css');
 		
 		$this->context->controller->addJS($this->_path.'views/templates/front/js/parcelshoplocator.js');
@@ -279,6 +280,44 @@ class DpdShipping extends CarrierModule
 		$parcel_shop = new DPDParcelShop();
 		$parcel_shop->add($cart_id, $selected_parcelshop_id, $selected_parcelshop_details);
 		
+	}
+	
+	public function hookDisplayAdminOrderLeft(&$params)
+	{
+		$orderCarrier = new Carrier($params['cart']->id_carrier);
+		$parcelShopCarrier = new Carrier(Configuration::get('DPDSHIPPING_SHOP_DELIVERY_CARRIER_ID'));
+		
+		$parcelshop = new DPDParcelShop($params['cart']->id);
+		
+		if($parcelshop->id_parcelshop != 0)
+		{
+			$parcelshop = new DPDParcelShop($params['cart']->id);
+			
+			$params['smarty']->tpl_vars['addresses']->value['delivery']->id = -1;
+			$params['smarty']->tpl_vars['addresses']->value['delivery']->id_country = 3;
+			$params['smarty']->tpl_vars['addresses']->value['delivery']->alias = 'ParcelShop';
+			$params['smarty']->tpl_vars['addresses']->value['delivery']->company = 'ParcelShop';
+			$params['smarty']->tpl_vars['addresses']->value['delivery']->firstname = $parcelshop->shop_name;
+			$params['smarty']->tpl_vars['addresses']->value['delivery']->lastname = '';
+			$params['smarty']->tpl_vars['addresses']->value['delivery']->address1 = $parcelshop->shop_street . " " . $parcelshop->shop_houseno;
+			$params['smarty']->tpl_vars['addresses']->value['delivery']->postcode = $parcelshop->shop_zipcode;
+			$params['smarty']->tpl_vars['addresses']->value['delivery']->city = $parcelshop->shop_city;
+			
+			$newAddress = $params['smarty']->tpl_vars['customer_addresses']->value[0];
+			
+			$newAddress['id_address'] = '-1';
+			$newAddress['alias'] = 'ParcelShop';
+			$newAddress['id_country'] = Country::getIdByName(null, $parcelshop->shop_country);
+			$newAddress['company'] = $parcelshop->shop_name;
+			$newAddress['address1'] = $parcelshop->shop_street . " " . $parcelshop->shop_houseno;
+			$newAddress['postcode'] = '1000';
+			$newAddress['city'] = $parcelshop->shop_city;
+			
+			$params['smarty']->tpl_vars['customer_addresses']->value[] = $newAddress;
+			
+			$params['smarty']->tpl_vars['order']->value->id_address_delivery = -1;
+		}
+
 	}
 	
 	public function hookUpdateCarrier($params)
@@ -370,7 +409,7 @@ class DpdConfig
 							'label' => 'Yes'
 						),
 						array(
-							'id_' => 'active_off',
+							'id' => 'active_off',
 							'value' => 2,
 							'label' => 'No',
 						)

@@ -19,8 +19,11 @@ class DPDParcelShop
 	public $shop_city;
 	
 	
-	public function __construct(){
+	public function __construct($id_cart = null){
 		$this->table = 'cart_dpdparcelshop';
+		if($id_cart != null){
+			$this->lookup($id_cart);
+		}
 	}
 	
 	public static function install()
@@ -35,7 +38,7 @@ class DPDParcelShop
 			`shop_zipcode` varchar(10) DEFAULT NULL,
 			`shop_city` varchar(50) DEFAULT NULL,
 			`date_add` datetime DEFAULT CURRENT_TIMESTAMP,
-			`date_update`datetime DEFAULT CURRENT_TIMESTAMP
+			`date_update`datetime DEFAULT CURRENT_TIMESTAMP,
 			PRIMARY KEY (`id_cart`)
 			) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
 			
@@ -47,10 +50,10 @@ class DPDParcelShop
 		if($shop_details)
 		{
 			return(Db::getInstance()->execute("INSERT INTO "._DB_PREFIX_.$this->table." (`id_cart`,`id_parcelshop`,`shop_name`,`shop_street`,`shop_houseno`,`shop_country`,`shop_zipcode`,`shop_city`) 
-				VALUES (".(int)$id_cart.",".(int)$shop_id.",'".(string)$shop_details->name."','".(string)$shop_details->street."','".(string)$shop_details->houseNo."','".(string)$shop_details->country."','".(string)$shop_details->zipCode."','".(string)$shop_details->city."')
+				VALUES (".(int)$id_cart.",".(int)$shop_id.",'".pSQL((string)$shop_details->name)."','".(string)$shop_details->street."','".(string)$shop_details->houseNo."','".(string)$shop_details->country."','".(string)$shop_details->zipCode."','".(string)$shop_details->city."')
 				ON DUPLICATE KEY UPDATE
 					`id_parcelshop` =  ".(int)$shop_id.",
-					`shop_name` = '".(string)$shop_details->name."',
+					`shop_name` = '".pSQL((string)$shop_details->name)."',
 					`shop_street` = '".(string)$shop_details->street."',
 					`shop_houseno` = '".(string)$shop_details->houseNo."',
 					`shop_country` = '".(string)$shop_details->country."',
@@ -74,7 +77,7 @@ class DPDParcelShop
 	
 	public function lookup($id_cart)
 	{
-		$sql = 'SELECT * FROM '._DB_PREFIX_.$this->table.' WHERE `id_cart` = '.$id_cart.' ORDER BY `date_add`;';
+		$sql = 'SELECT * FROM '._DB_PREFIX_.$this->table.' WHERE `id_cart` = '.(int)$id_cart.' ORDER BY `date_add`;';
 		if ($row = Db::getInstance()->getRow($sql))
 		{
 			$this->id_parcelshop = $row['id_parcelshop'];
